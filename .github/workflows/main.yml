@@ -17,4 +17,3 @@ jobs:
           node-version: '16.x'
       - run: npm i
       - run: npm run lint && npm run build
-      - run: npm publish
