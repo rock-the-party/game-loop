@@ -15,7 +15,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '16.x'
-          registry-url: 'https://www.npmjs.com/package/@r-t-p/game-loop'
+          registry-url: 'https://www.npmjs.com/package'
           scope: '@r-t-p'
       - run: npm i
       - run: npm run lint && npm run build
