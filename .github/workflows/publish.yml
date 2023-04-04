@@ -17,6 +17,8 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '16.x'
+          registry-url: 'https://www.npmjs.com/package/@r-t-p/game-loop'
+          scope: '@r-t-p'
       - run: npm i --frozen-lockfile
       - name: Create Release Pull Request or Publish
         id: changesets
