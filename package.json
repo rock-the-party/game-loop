@@ -8,7 +8,8 @@
     "test": "jest",
     "build": "tsc",
     "preversion": "npm run test",
-    "version": "npm run build"
+    "version": "npm run build",
+    "postversion": "git push && git push --tags"
   },
   "repository": {
     "type": "git",
