@@ -9,6 +9,7 @@
     "build": "tsc",
     "preversion": "npm run test",
     "version": "npm run build",
+    "postversion": "git push && git push --tags",
     "publish": "npm publish --access=public"
   },
   "repository": {
