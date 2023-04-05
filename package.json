@@ -8,8 +8,7 @@
     "test": "jest",
     "build": "tsc",
     "preversion": "npm run test",
-    "version": "npm run build",
-    "publish": "npm publish --access=public"
+    "version": "npm run build"
   },
   "repository": {
     "type": "git",
