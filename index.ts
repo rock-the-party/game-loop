@@ -10,6 +10,7 @@ type LoopState = "Looping" | "Paused" | "Unknown";
 
 interface IGameLoop {
   readonly state: LoopState;
+  fps: number;
   addItem(item: ILoopItem): void;
   getItem(id: string): ILoopItem | undefined;
   removeItem(id: string): ILoopItem | undefined;
@@ -17,13 +18,13 @@ interface IGameLoop {
   pause(): void;
   unpause(): void;
   end(): void;
-  setFPS(milliseconds: number): void;
 }
 
 class GameLoop implements IGameLoop {
   private items: ILoopItem[] = [];
   private lastUpdateTime: number;
-  private tickRate: number = 66;
+
+  public fps: number = 15;
 
   private _state: LoopState = "Unknown";
   get state(): LoopState {
@@ -32,11 +33,6 @@ class GameLoop implements IGameLoop {
 
   constructor() {
     this.lastUpdateTime = performance.now();
-    this.setFPS(15);
-  }
-
-  public setFPS(milliseconds: number): void {
-    this.tickRate = Math.max(1000 / milliseconds, 0.000001);
   }
 
   public addItem(item: ILoopItem): void {
@@ -89,7 +85,7 @@ class GameLoop implements IGameLoop {
 
     if (this.state !== "Looping" || this.items.length === 0) return;
 
-    let waitTime = this.tickRate - elapsedTime;
+    let waitTime = (Math.max(1000 / this.fps, 0.000001)) - elapsedTime;
     if (waitTime < 0) {
       waitTime = 0;
     }
