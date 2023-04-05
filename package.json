@@ -7,7 +7,9 @@
   "scripts": {
     "test": "jest",
     "build": "tsc",
-    "publish": "npm publish --access=public"
+    "publish": "npm publish --access=public",
+    "preversion": "npm run test",
+    "version": "npm run build"
   },
   "repository": {
     "type": "git",
