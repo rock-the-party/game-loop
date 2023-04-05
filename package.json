@@ -1,12 +1,14 @@
 {
   "name": "@r-t-p/game-loop",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "description": "A game loop",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "test": "jest",
     "build": "tsc",
+    "preversion": "npm run test",
+    "version": "npm run build",
     "publish": "npm publish --access=public"
   },
   "repository": {
@@ -24,15 +26,16 @@
   "homepage": "https://github.com/rock-the-party/game-loop#readme",
   "devDependencies": {
     "jest": "^29.5.0",
-    "typescript": "^5.0.3"
-  },
-  "dependencies": {
+    "typescript": "^5.0.3",
     "@types/jest": "^29.5.0",
     "ts-jest": "^29.1.0"
   },
   "jest": {
     "preset": "ts-jest",
     "testEnvironment": "node",
-    "testMatch": ["**/__tests__/**/*.ts?(x)", "**/?(*.)+(spec|test).ts?(x)"]
+    "testMatch": [
+      "**/__tests__/**/*.ts?(x)",
+      "**/?(*.)+(spec|test).ts?(x)"
+    ]
   }
 }
