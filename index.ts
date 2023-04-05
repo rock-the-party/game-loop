@@ -1,13 +1,14 @@
-export interface ILoopItem {
+interface ILoopItem {
   readonly id: string;
-  handleInput(): Promise<void>;
-  update(elapsedMilliseconds: number): Promise<void>;
-  render(): Promise<void>;
+  handleInput(): void;
+  update(elapsedMilliseconds: number): void;
+  render(): void;
+  isFinished(): boolean;
 }
 
-export type LoopState = "Looping" | "Paused" | "Unknown";
+type LoopState = "Looping" | "Paused" | "Unknown";
 
-export interface IGameLoop {
+interface IGameLoop {
   readonly state: LoopState;
   addItem(item: ILoopItem): void;
   getItem(id: string): ILoopItem | undefined;
@@ -19,10 +20,8 @@ export interface IGameLoop {
   setFPS(milliseconds: number): void;
 }
 
-export class GameLoop implements IGameLoop {
+class GameLoop implements IGameLoop {
   private items: ILoopItem[] = [];
-  private isPaused = false;
-  private isLooping = false;
   private lastUpdateTime: number;
   private tickRate: number = 66;
 
@@ -35,7 +34,7 @@ export class GameLoop implements IGameLoop {
     this.lastUpdateTime = performance.now();
     this.setFPS(15);
   }
-  
+
   public setFPS(milliseconds: number): void {
     this.tickRate = Math.max(1000 / milliseconds, 0.000001);
   }
@@ -43,7 +42,7 @@ export class GameLoop implements IGameLoop {
   public addItem(item: ILoopItem): void {
     this.items.push(item);
     if (this.items.length === 1) {
-      Promise.resolve(this.loop());
+      this.loop();
     }
   }
 
@@ -58,73 +57,61 @@ export class GameLoop implements IGameLoop {
   }
   
   public start(): void {
-    if (this.isLooping) {
-      return;
-    }
-    this.isPaused = false;
-    this.lastUpdateTime = this.getCurrentTime();
-    this.isLooping = true;
-    Promise.resolve(this.loop());
+    if (this.state === "Looping") return;
+    this._state = "Looping"
+    this.lastUpdateTime = Date.now();
+    this.loop();
   }
   
   public pause(): void {
-    this.isPaused = true;
+    this._state = "Paused";
   }
 
   public unpause(): void {
-    this.isPaused = false;
-    Promise.resolve(this.loop());
+    this._state = "Looping";
+    this.lastUpdateTime = Date.now();
+    this.loop();
   }
 
   public end(): void {
     this.lastUpdateTime = 0;
-    this.isLooping = false;
     this._state = "Unknown";
   }
 
-  async loop(): Promise<void> {
-    if (!this.isLooping) return;
-
-    const now = this.getCurrentTime();
+  loop(): void {
+    const now = Date.now();
     const elapsedTime = now - this.lastUpdateTime;
     this.lastUpdateTime = now;
 
-    await this.input()
-    await this.update(elapsedTime);
-    await this.render();
+    this.input()
+    this.update(elapsedTime);
+    this.render();
 
-    if (this.isPaused) return;
+    if (this.state !== "Looping" || this.items.length === 0) return;
 
     let waitTime = this.tickRate - elapsedTime;
     if (waitTime < 0) {
       waitTime = 0;
     }
-    setTimeout(this.loop, waitTime);
+    setTimeout(() => this.loop(), waitTime);
   }
 
-  private async input(): Promise<void> {
-    await Promise.all(this.items.map(i => i.handleInput));
+  private input(): void {
+    this.items.map(i => i.handleInput());
   }
 
-  private async update(elapsedMilliseconds: number): Promise<void> {
-    for (const item of this.items) {
-      await item.update(elapsedMilliseconds);
-    }
+  private update(elapsedMilliseconds: number): void {
+    this.items.map(i => i.update(elapsedMilliseconds));
+    this.items = this.items.filter(item => !item.isFinished())
   }
 
-  private async render(): Promise<void> {
-    for (const item of this.items) {
-      await item.render();
-    }
-  }
-
-  private getCurrentTime(): number {
-    return Date.now();
+  private render(): void {
+    this.items.map(i => i.render());
   }
 }
 
 // Lifted from: https://stackoverflow.com/a/8809472
-export function generateID(): string {
+function generateID(): string {
   let
     d = new Date().getTime(),
     d2 = ((typeof performance !== 'undefined') && performance.now && (performance.now() * 1000)) || 0;
@@ -140,3 +127,11 @@ export function generateID(): string {
     return (c == 'x' ? r : (r & 0x7 | 0x8)).toString(16);
   });
 };
+
+export {
+  generateID,
+  GameLoop,
+  IGameLoop,
+  ILoopItem,
+  LoopState
+}
