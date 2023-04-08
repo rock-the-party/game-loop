@@ -1,4 +1,4 @@
-import { GameLoop, IGameLoop, ILoopItem, LoopState, generateID } from "./index";
+import { GameLoop, IGameLoop, ILoopItem } from "./index";
 
 describe("GameLoop", () => {
   let gameLoop: IGameLoop;
@@ -7,7 +7,7 @@ describe("GameLoop", () => {
   beforeEach(() => {
     gameLoop = new GameLoop();
     loopItem = {
-      id: generateID(),
+      id: "id",
       handleInput: jest.fn(),
       update: jest.fn(),
       render: jest.fn(),
@@ -15,17 +15,11 @@ describe("GameLoop", () => {
     };
   });
 
-  afterEach(() => {
-    gameLoop.end();
-  });
-
   it("should start the game loop", () => {
-    gameLoop.start();
     expect(gameLoop.state).toBe("Looping");
   });
 
   it("should pause and unpause the game loop", () => {
-    gameLoop.start();
     gameLoop.pause();
     expect(gameLoop.state).toBe("Paused");
 
@@ -43,25 +37,18 @@ describe("GameLoop", () => {
 
   it("should update and render loop items", () => {
     gameLoop.addItem(loopItem);
-    gameLoop.start();
 
     expect(loopItem.handleInput).toHaveBeenCalled();
     expect(loopItem.update).toHaveBeenCalled();
     expect(loopItem.render).toHaveBeenCalled();
+    gameLoop.removeItem(loopItem.id);
   });
 
   it("should remove finished loop items", () => {
     loopItem.isFinished = jest.fn(() => true);
     gameLoop.addItem(loopItem);
-    gameLoop.start();
 
     expect(loopItem.isFinished).toHaveBeenCalled();
     expect(gameLoop.getItem(loopItem.id)).toBeUndefined();
-  });
-
-  it("should end the game loop", () => {
-    gameLoop.start();
-    gameLoop.end();
-    expect(gameLoop.state).toBe("Unknown");
   });
 });

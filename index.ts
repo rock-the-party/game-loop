@@ -6,7 +6,7 @@ interface ILoopItem {
   isFinished(): boolean;
 }
 
-type LoopState = "Looping" | "Paused" | "Unknown";
+type LoopState = "Looping" | "Paused";
 
 interface IGameLoop {
   readonly state: LoopState;
@@ -14,30 +14,25 @@ interface IGameLoop {
   addItem(item: ILoopItem): void;
   getItem(id: string): ILoopItem | undefined;
   removeItem(id: string): ILoopItem | undefined;
-  start(): void;
   pause(): void;
   unpause(): void;
-  end(): void;
 }
 
 class GameLoop implements IGameLoop {
   private items: ILoopItem[] = [];
-  private lastUpdateTime: number;
+  private lastUpdateTime: number = 0;
 
   public fps: number = 15;
 
-  private _state: LoopState = "Unknown";
+  private _state: LoopState = "Looping";
   get state(): LoopState {
     return this._state;
   };
 
-  constructor() {
-    this.lastUpdateTime = performance.now();
-  }
-
   public addItem(item: ILoopItem): void {
     this.items.push(item);
     if (this.items.length === 1) {
+      this.lastUpdateTime = performance.now();
       this.loop();
     }
   }
@@ -51,14 +46,7 @@ class GameLoop implements IGameLoop {
     this.items = this.items.filter(v => v.id !== id);
     return item;
   }
-  
-  public start(): void {
-    if (this.state === "Looping") return;
-    this._state = "Looping"
-    this.lastUpdateTime = Date.now();
-    this.loop();
-  }
-  
+
   public pause(): void {
     this._state = "Paused";
   }
@@ -67,11 +55,6 @@ class GameLoop implements IGameLoop {
     this._state = "Looping";
     this.lastUpdateTime = Date.now();
     this.loop();
-  }
-
-  public end(): void {
-    this.lastUpdateTime = 0;
-    this._state = "Unknown";
   }
 
   loop(): void {
@@ -85,7 +68,7 @@ class GameLoop implements IGameLoop {
 
     if (this.state !== "Looping" || this.items.length === 0) return;
 
-    let waitTime = (Math.max(1000 / this.fps, 0.000001)) - elapsedTime;
+    let waitTime = (1000 / Math.max(this.fps, 0.000001)) - elapsedTime;
     if (waitTime < 0) {
       waitTime = 0;
     }
@@ -106,26 +89,8 @@ class GameLoop implements IGameLoop {
   }
 }
 
-// Lifted from: https://stackoverflow.com/a/8809472
-function generateID(): string {
-  let
-    d = new Date().getTime(),
-    d2 = ((typeof performance !== 'undefined') && performance.now && (performance.now() * 1000)) || 0;
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-    let r = Math.random() * 16;
-    if (d > 0) {
-      r = (d + r) % 16 | 0;
-      d = Math.floor(d / 16);
-    } else {
-      r = (d2 + r) % 16 | 0;
-      d2 = Math.floor(d2 / 16);
-    }
-    return (c == 'x' ? r : (r & 0x7 | 0x8)).toString(16);
-  });
-};
 
 export {
-  generateID,
   GameLoop,
   IGameLoop,
   ILoopItem,
