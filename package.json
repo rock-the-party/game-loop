@@ -11,9 +11,9 @@
     "preversion": "npm run test",
     "version": "npm run build",
     "postversion": "git push && git push --tags",
-    "v-bump": "npm version patch",
-    "v-minor-bump": "npm version minor",
-    "v-major-bump": "npm version major"
+    "bump": "npm version patch",
+    "bump-minor": "npm version minor",
+    "bump-major": "npm version major"
   },
   "repository": {
     "type": "git",
