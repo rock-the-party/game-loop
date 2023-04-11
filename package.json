@@ -2,8 +2,8 @@
   "name": "@r-t-p/game-loop",
   "version": "0.1.0",
   "description": "A game loop",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "bin/index.js",
+  "types": "bin/index.d.ts",
   "scripts": {
     "test": "jest",
     "build": "tsc",
